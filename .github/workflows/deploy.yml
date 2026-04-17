@@ -22,7 +22,7 @@ jobs:
         run: flutter pub get
 
       - name: Build Web
-        run: flutter build web --base-href /shift_tomo/
+        run: flutter build web --release --base-href "/Shift-Tomo/"
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
