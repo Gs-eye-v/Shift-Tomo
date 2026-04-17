@@ -6,7 +6,7 @@ part of 'salary_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$monthlySalaryHash() => r'da6d234ab8bf40155c48aeeefc3a33b6db93b6e3';
+String _$monthlySalaryHash() => r'e7871a727403dc64643bfc758b5b54106904e3c1';
 
 /// See also [monthlySalary].
 @ProviderFor(monthlySalary)

@@ -3,36 +3,50 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../model/shift.dart';
 import '../model/shift_tag.dart';
 import '../provider/tag_provider.dart';
+import '../provider/app_settings_provider.dart';
 
 class CalendarCell extends ConsumerWidget {
   final DateTime date;
   final List<Shift> shifts;
+  final List<Shift> sharedShifts;
   final bool isToday;
   final bool isCurrentMonth;
-  final VoidCallback? onTap;
+  final VoidCallback onTap;
 
   const CalendarCell({
     super.key,
     required this.date,
     required this.shifts,
+    this.sharedShifts = const [],
     this.isToday = false,
     this.isCurrentMonth = true,
-    this.onTap,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // タグ情報を取得
     final tagsAsync = ref.watch(tagNotifierProvider);
+    final theme = Theme.of(context);
+    final secondaryColor = theme.colorScheme.secondary;
     
     return Container(
+      margin: const EdgeInsets.all(2),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.withOpacity(0.2), width: 0.5),
-        color: _getBackgroundColor(tagsAsync.value ?? []),
+        color: _getBackgroundColor(context, tagsAsync.value ?? []),
+        borderRadius: BorderRadius.circular(12),
+        border: isToday 
+            ? Border.all(color: secondaryColor, width: 2)
+            : Border.all(color: theme.dividerColor, width: 1),
+        boxShadow: isToday ? [
+          BoxShadow(
+            color: secondaryColor.withOpacity(0.2),
+            blurRadius: 8,
+            spreadRadius: 1,
+          )
+        ] : null,
       ),
       child: Stack(
         children: [
-          // 1. コンテンツレイヤー (LayoutBuilder)
           LayoutBuilder(
             builder: (context, constraints) {
               const emojiStyle = TextStyle(
@@ -65,33 +79,45 @@ class CalendarCell extends ConsumerWidget {
     
               return Stack(
                 children: [
-                  // 1. Emojis/Grid (メインコンテンツ)
-                  _buildContent(appliedTags, emojiStyle),
+                  _buildContent(ref, appliedTags, emojiStyle),
     
-                  // 2. メモアイコン (右下隅に絶対配置)
-                  if (memo != null && memo.isNotEmpty)
-                    const Positioned(
-                      bottom: 2,
+                  if (sharedShifts.isNotEmpty)
+                    Positioned(
+                      bottom: 4,
+                      left: 2,
                       right: 2,
-                      child: Text(
-                        '📝',
-                        style: TextStyle(fontSize: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: sharedShifts.expand((s) {
+                          return s.tagIds.map((id) {
+                            final tag = tagsAsync.value?.where((t) => t.id == id).firstOrNull;
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 1.0),
+                              child: Text(tag?.emoji ?? '?', style: const TextStyle(fontSize: 8)),
+                            );
+                          });
+                        }).toList(),
                       ),
                     ),
     
-                  // 3. 日付 (右上隅)
+                  if (memo != null && memo.isNotEmpty)
+                    const Positioned(
+                      bottom: 4,
+                      right: 4,
+                      child: Text('📝', style: TextStyle(fontSize: 10)),
+                    ),
+    
                   Positioned(
-                    top: 2,
-                    right: 2,
+                    top: 4,
+                    right: 6,
                     child: Text(
                       '${date.day}',
                       style: TextStyle(
                         fontSize: 11,
-                        color: isCurrentMonth ? null : Colors.grey.withOpacity(0.5),
-                        fontWeight: FontWeight.bold,
-                        shadows: [
-                          Shadow(color: Theme.of(context).scaffoldBackgroundColor, blurRadius: 4),
-                        ],
+                        color: isCurrentMonth 
+                            ? (isToday ? secondaryColor : theme.textTheme.bodyLarge?.color) 
+                            : theme.textTheme.bodyLarge?.color?.withOpacity(0.25),
+                        fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
                       ),
                     ),
                   ),
@@ -100,12 +126,14 @@ class CalendarCell extends ConsumerWidget {
             },
           ),
           
-          // 2. ヒットレイヤー (最前面でタップを確実に捕捉)
           Positioned.fill(
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: onTap,
-              child: const SizedBox.expand(),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onTap,
+                borderRadius: BorderRadius.circular(12),
+                splashColor: theme.colorScheme.primary.withOpacity(0.1),
+              ),
             ),
           ),
         ],
@@ -113,67 +141,85 @@ class CalendarCell extends ConsumerWidget {
     );
   }
 
-  Widget _buildContent(List<ShiftTag> appliedTags, TextStyle style) {
+  Widget _buildContent(WidgetRef ref, List<ShiftTag> appliedTags, TextStyle style) {
     final count = appliedTags.length;
-
     if (count == 0) return const SizedBox.expand();
 
-    // 1つだけの場合は特大表示 (フルセル)
     if (count == 1) {
-      return Center(
-        child: FractionallySizedBox(
-          widthFactor: 0.75,
-          heightFactor: 0.75,
-          child: FittedBox(
-            fit: BoxFit.contain,
-            child: Text(appliedTags.first.emoji, style: style),
+      return _withEmojiStyle(
+        ref,
+        Center(
+          child: FractionallySizedBox(
+            widthFactor: 0.65,
+            heightFactor: 0.65,
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: Text(appliedTags.first.emoji, style: style),
+            ),
           ),
         ),
       );
     }
 
-    // 2つの場合は上下二分割
     if (count == 2) {
-      return Column(
-        children: [
-          Expanded(child: _buildEmojiSlot(appliedTags[0].emoji, style)),
-          Expanded(child: _buildEmojiSlot(appliedTags[1].emoji, style)),
-        ],
+      return _withEmojiStyle(
+        ref,
+        Column(
+          children: [
+            Expanded(child: _buildEmojiSlot(appliedTags[0].emoji, style)),
+            Expanded(child: _buildEmojiSlot(appliedTags[1].emoji, style)),
+          ],
+        ),
       );
     }
 
-    // 3〜4つの場合は2x2グリッド
-    return Column(
-      children: [
-        Expanded(
-          child: Row(
-            children: [
-              Expanded(child: _buildEmojiSlot(appliedTags[0].emoji, style)),
-              Expanded(child: _buildEmojiSlot(appliedTags[1].emoji, style)),
-            ],
+    return _withEmojiStyle(
+      ref,
+      Column(
+        children: [
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(child: _buildEmojiSlot(appliedTags[0].emoji, style)),
+                Expanded(child: _buildEmojiSlot(appliedTags[1].emoji, style)),
+              ],
+            ),
           ),
-        ),
-        Expanded(
-          child: Row(
-            children: [
-              Expanded(child: _buildEmojiSlot(appliedTags[2].emoji, style)),
-              Expanded(
-                child: count > 3 
-                  ? _buildEmojiSlot(appliedTags[3].emoji, style)
-                  : const SizedBox.expand()
-              ),
-            ],
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(child: _buildEmojiSlot(appliedTags[2].emoji, style)),
+                Expanded(
+                  child: count > 3 
+                    ? _buildEmojiSlot(appliedTags[3].emoji, style)
+                    : const SizedBox.expand()
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
+    );
+  }
+
+  Widget _withEmojiStyle(WidgetRef ref, Widget child) {
+    final useColor = ref.watch(appSettingsNotifierProvider).useColorEmoji;
+    if (useColor) return child;
+
+    return ColorFiltered(
+      colorFilter: const ColorFilter.mode(
+        Colors.grey,
+        BlendMode.saturation,
+      ),
+      child: child,
     );
   }
 
   Widget _buildEmojiSlot(String emoji, TextStyle style) {
     return Center(
       child: FractionallySizedBox(
-        widthFactor: 0.8,
-        heightFactor: 0.8,
+        widthFactor: 0.7,
+        heightFactor: 0.7,
         child: FittedBox(
           fit: BoxFit.contain,
           child: Text(emoji, style: style),
@@ -182,14 +228,14 @@ class CalendarCell extends ConsumerWidget {
     );
   }
 
-  Color? _getBackgroundColor(List<ShiftTag> allTags) {
-    if (shifts.isEmpty) return null;
+  Color? _getBackgroundColor(BuildContext context, List<ShiftTag> allTags) {
+    if (shifts.isEmpty) return Theme.of(context).cardColor;
     final tagIds = shifts.first.tagIds;
-    if (tagIds.isEmpty) return null;
+    if (tagIds.isEmpty) return Theme.of(context).cardColor;
     
     final firstTag = allTags.where((t) => t.id == tagIds.first).firstOrNull;
-    if (firstTag == null) return null;
+    if (firstTag == null) return Theme.of(context).cardColor;
     
-    return firstTag.color.withOpacity(0.3);
+    return firstTag.color.withOpacity(0.15);
   }
 }

@@ -3,6 +3,14 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 
+/// 復号化失敗時に投げられるカスタム例外
+class DecryptionException implements Exception {
+  final String message;
+  DecryptionException(this.message);
+  @override
+  String toString() => 'DecryptionException: $message';
+}
+
 /// E2EE (エンドツーエンド暗号化) を担当するサービス
 class EncryptionService {
   final String _password;
@@ -44,7 +52,7 @@ class EncryptionService {
       final combined = base64.decode(combinedBase64);
       
       if (combined.length < 16) {
-        throw Exception('Invalid encrypted data: too short to contain IV');
+        throw DecryptionException('Invalid encrypted data: too short to contain IV');
       }
 
       // 先頭16バイトがIV
@@ -56,7 +64,7 @@ class EncryptionService {
       
       return encrypter.decrypt(encrypt.Encrypted(ciphertextBytes), iv: iv);
     } catch (e) {
-      throw Exception('Decryption failed: $e');
+      throw DecryptionException('復号に失敗しました。パスワードが正しくない可能性があります。($e)');
     }
   }
 }

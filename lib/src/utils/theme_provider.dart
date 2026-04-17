@@ -7,7 +7,7 @@ part 'theme_provider.g.dart';
 class ThemeNotifier extends _$ThemeNotifier {
   @override
   AppThemeType build() {
-    return AppThemeType.dark;
+    return AppThemeType.light;
   }
 
   void setTheme(AppThemeType type) {

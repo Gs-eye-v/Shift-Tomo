@@ -18,10 +18,9 @@ class DatabaseService {
     final path = p.join(dbPath, 'shift_checker.db');
     return await sqlite.openDatabase(
       path,
-      version: 3, // バージョンを3に上げる
+      version: 4, // バージョンを4に上げる
       onCreate: (db, version) async {
         await db.execute('CREATE TABLE profiles (id TEXT PRIMARY KEY, name TEXT, is_me INTEGER)');
-        // バージョン3相当の初期テーブル作成
         await db.execute('''
           CREATE TABLE shift_tags (
             id TEXT PRIMARY KEY, 
@@ -33,7 +32,9 @@ class DatabaseService {
             end_time TEXT, 
             break_minutes INTEGER DEFAULT 60, 
             hourly_wage INTEGER, 
-            is_day_off INTEGER DEFAULT 0
+            is_day_off INTEGER DEFAULT 0,
+            is_notification_enabled INTEGER DEFAULT 0,
+            reminders TEXT
           )
         ''');
         await db.execute('CREATE TABLE shifts (id TEXT PRIMARY KEY, profile_id TEXT, tag_id TEXT, date TEXT, memo TEXT, sub_tasks TEXT)');
@@ -41,17 +42,20 @@ class DatabaseService {
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
-          // V2: 旧フィールド追加
           await db.execute('ALTER TABLE shift_tags ADD COLUMN hourly_rate REAL');
           await db.execute('ALTER TABLE shift_tags ADD COLUMN work_hours REAL');
         }
         if (oldVersion < 3) {
-          // V3: 新規フィールド追加
           await db.execute('ALTER TABLE shift_tags ADD COLUMN start_time TEXT');
           await db.execute('ALTER TABLE shift_tags ADD COLUMN end_time TEXT');
           await db.execute('ALTER TABLE shift_tags ADD COLUMN break_minutes INTEGER DEFAULT 60');
           await db.execute('ALTER TABLE shift_tags ADD COLUMN hourly_wage INTEGER');
           await db.execute('ALTER TABLE shift_tags ADD COLUMN is_day_off INTEGER DEFAULT 0');
+        }
+        if (oldVersion < 4) {
+          // V4: 通知設定の追加
+          await db.execute('ALTER TABLE shift_tags ADD COLUMN is_notification_enabled INTEGER DEFAULT 0');
+          await db.execute('ALTER TABLE shift_tags ADD COLUMN reminders TEXT');
         }
       },
     );

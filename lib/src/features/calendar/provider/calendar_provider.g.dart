@@ -21,7 +21,7 @@ final focusedMonthProvider =
 );
 
 typedef _$FocusedMonth = AutoDisposeNotifier<DateTime>;
-String _$calendarNotifierHash() => r'c98cf897c327e21d8e6c7bac1005bb26560965b0';
+String _$calendarNotifierHash() => r'7f741064fa22cf66f0a97ffb1cd46664c2dc83a1';
 
 /// See also [CalendarNotifier].
 @ProviderFor(CalendarNotifier)

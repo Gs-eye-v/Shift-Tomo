@@ -7,7 +7,7 @@ part of 'sync_settings_provider.dart';
 // **************************************************************************
 
 String _$syncSettingsNotifierHash() =>
-    r'fccf805e119c5f3e6c27015514c584d02224b9b0';
+    r'11e358a81cc058dcb457f1d348989476f873ac1f';
 
 /// See also [SyncSettingsNotifier].
 @ProviderFor(SyncSettingsNotifier)

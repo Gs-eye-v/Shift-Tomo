@@ -44,7 +44,7 @@ class HolidayFinderPage extends ConsumerWidget {
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.0),
             child: Text(
-              'ルーム内の全員のシフトを照合し、全員が勤務なし（休み）の日をハイライトします。',
+              '友達全員のシフトを照合し、全員が勤務なし（休み）の日をハイライトします。',
               style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ),

@@ -1,26 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'theme_provider.dart';
+part of 'app_settings_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$themeNotifierHash() => r'16649cde9c5aed0c721332479d8ce3e3ecbc84cc';
+String _$appSettingsNotifierHash() =>
+    r'803b61d29b723cac34530c8ef9c688ac6587afc9';
 
-/// See also [ThemeNotifier].
-@ProviderFor(ThemeNotifier)
-final themeNotifierProvider =
-    AutoDisposeNotifierProvider<ThemeNotifier, AppThemeType>.internal(
-  ThemeNotifier.new,
-  name: r'themeNotifierProvider',
+/// See also [AppSettingsNotifier].
+@ProviderFor(AppSettingsNotifier)
+final appSettingsNotifierProvider =
+    AutoDisposeNotifierProvider<AppSettingsNotifier, AppSettings>.internal(
+  AppSettingsNotifier.new,
+  name: r'appSettingsNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$themeNotifierHash,
+      : _$appSettingsNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$ThemeNotifier = AutoDisposeNotifier<AppThemeType>;
+typedef _$AppSettingsNotifier = AutoDisposeNotifier<AppSettings>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

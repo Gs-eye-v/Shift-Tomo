@@ -23,7 +23,42 @@ final syncRepositoryProvider = AutoDisposeProvider<SyncRepository>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef SyncRepositoryRef = AutoDisposeProviderRef<SyncRepository>;
-String _$syncNotifierHash() => r'e11a968725fac12ed4f33a76daba0308f6414367';
+String _$isSyncRequiredHash() => r'415fedfc958285c4100658ac6ab3e01d092b2118';
+
+/// 同期が必要かどうかをデータ差分で自動判定するプロバイダー
+///
+/// Copied from [isSyncRequired].
+@ProviderFor(isSyncRequired)
+final isSyncRequiredProvider = Provider<bool>.internal(
+  isSyncRequired,
+  name: r'isSyncRequiredProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$isSyncRequiredHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef IsSyncRequiredRef = ProviderRef<bool>;
+String _$syncSnapshotHash() => r'54626568e5c3f3ecb86950cb500790f5edea3c2e';
+
+/// 最後に同期（または起動時に読み込み）に成功したデータのスナップショットを保持
+///
+/// Copied from [SyncSnapshot].
+@ProviderFor(SyncSnapshot)
+final syncSnapshotProvider = NotifierProvider<SyncSnapshot, String?>.internal(
+  SyncSnapshot.new,
+  name: r'syncSnapshotProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$syncSnapshotHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$SyncSnapshot = Notifier<String?>;
+String _$syncNotifierHash() => r'fcdae6eae06abd2413f42dff32dfe5f9b2037912';
 
 /// See also [SyncNotifier].
 @ProviderFor(SyncNotifier)
