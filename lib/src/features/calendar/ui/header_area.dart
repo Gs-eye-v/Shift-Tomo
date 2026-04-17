@@ -42,7 +42,7 @@ class HeaderArea extends ConsumerWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: gradientColors,
@@ -57,72 +57,84 @@ class HeaderArea extends ConsumerWidget {
           ),
         ],
       ),
-      child: Row(
-        children: [
-          const Text(
-            'シフトモ',
-            style: TextStyle(
-              fontSize: 20, 
-              fontWeight: FontWeight.bold, 
-              color: Colors.white,
-              letterSpacing: 1.5,
-            ),
-          ),
-          const Spacer(),
-          _HeaderIcon(
-            icon: Icons.person_add_outlined,
-            tooltip: '友達を追加',
-            onPressed: () => AddFriendDialog.show(context),
-          ),
-          const SizedBox(width: 8),
-          _HeaderIcon(
-            icon: Icons.share_outlined,
-            tooltip: '共有リンクをコピー',
-            onPressed: () => _handleShare(context, ref),
-          ),
-          const SizedBox(width: 8),
-          
-          // クラウド保存ボタン（差分がある場合のみ表示）
-          if (ref.watch(isSyncRequiredProvider)) ...[
-            _HeaderIcon(
-              icon: Icons.cloud_upload_outlined,
-              tooltip: 'クラウドに保存',
-              color: const Color(0xFFFFD700), // Gold/Amber to highlight importance
-              onPressed: () => _handleCloudPush(context, ref),
+      child: SafeArea(
+        bottom: false,
+        child: Row(
+          children: [
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: const Text(
+                    'シフトモ',
+                    style: TextStyle(
+                      fontSize: 20, 
+                      fontWeight: FontWeight.bold, 
+                      color: Colors.white,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                ),
+              ),
             ),
             const SizedBox(width: 8),
-          ],
+            _HeaderIcon(
+              icon: Icons.person_add_outlined,
+              tooltip: '友達を追加',
+              onPressed: () => AddFriendDialog.show(context),
+            ),
+            const SizedBox(width: 8),
+            _HeaderIcon(
+              icon: Icons.share_outlined,
+              tooltip: '共有リンクをコピー',
+              onPressed: () => _handleShare(context, ref),
+            ),
+            const SizedBox(width: 8),
+            
+            // クラウド保存ボタン（差分がある場合のみ表示）
+            if (ref.watch(isSyncRequiredProvider)) ...[
+              _HeaderIcon(
+                icon: Icons.cloud_upload_outlined,
+                tooltip: 'クラウドに保存',
+                color: const Color(0xFFFFD700),
+                onPressed: () => _handleCloudPush(context, ref),
+              ),
+              const SizedBox(width: 8),
+            ],
 
-          _HeaderIcon(
-            icon: Icons.photo_camera_outlined,
-            tooltip: 'カメラで読み取り',
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const ScanPage()),
+            _HeaderIcon(
+              icon: Icons.photo_camera_outlined,
+              tooltip: 'カメラで読み取り',
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ScanPage()),
+              ),
             ),
-          ),
-          const SizedBox(width: 8),
-          _HeaderIcon(
-            icon: Icons.add_circle_outline,
-            tooltip: 'シフトを追加',
-            onPressed: () => ShiftDialog.show(context),
-          ),
-          const SizedBox(width: 8),
-          _HeaderIcon(
-            icon: Icons.style_outlined,
-            tooltip: 'タグ管理',
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const TagManagementPage()),
+            const SizedBox(width: 8),
+            _HeaderIcon(
+              icon: Icons.add_circle_outline,
+              tooltip: 'シフトを追加',
+              onPressed: () => ShiftDialog.show(context),
             ),
-          ),
-          const SizedBox(width: 8),
-          _HeaderIcon(
-            icon: Icons.settings_outlined,
-            tooltip: '設定',
-            onPressed: () => SettingsSheet.show(context),
-          ),
-        ],
+            const SizedBox(width: 8),
+            _HeaderIcon(
+              icon: Icons.style_outlined,
+              tooltip: 'タグ管理',
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const TagManagementPage()),
+              ),
+            ),
+            const SizedBox(width: 8),
+            _HeaderIcon(
+              icon: Icons.settings_outlined,
+              tooltip: '設定',
+              onPressed: () => SettingsSheet.show(context),
+            ),
+          ],
+        ),
       ),
     );
   }

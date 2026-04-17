@@ -20,4 +20,5 @@ class DeviceService {
   }
 
   String get deviceId => _deviceId ?? '';
+  SharedPreferences get prefs => _prefs;
 }
