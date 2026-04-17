@@ -70,7 +70,7 @@ class MyApp extends ConsumerWidget {
     final themeType = ref.watch(themeNotifierProvider);
 
     return MaterialApp(
-      title: 'ShiftChecker',
+      title: 'Shift-Tomo',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.fromType(themeType),
       home: const SyncStartHandler(child: CalendarPage()),

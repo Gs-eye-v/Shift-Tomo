@@ -599,19 +599,47 @@ class _SettingsSheetState extends ConsumerState<SettingsSheet> {
 
   Future<void> _handleApply(BuildContext context, WidgetRef ref, dynamic settings) async {
     final notifier = ref.read(syncSettingsNotifierProvider.notifier);
-    if (_isEditingPassword) notifier.updatePassword(_passwordController.text);
+    
+    if (_isEditingPassword) {
+      final password = _passwordController.text;
+      final confirm = _confirmPasswordController.text;
+
+      if (password.isEmpty) {
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('パスワードを入力してください'), backgroundColor: Colors.orange));
+        return;
+      }
+
+      if (password != confirm) {
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('パスワードが一致しません'), backgroundColor: Colors.orange));
+        return;
+      }
+
+      if (!notifier.isPasswordValid(password)) {
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('パスワードは8文字以上、大文字・小文字・数字を含める必要があります'), backgroundColor: Colors.orange));
+        return;
+      }
+
+      notifier.updatePassword(password);
+    }
+
     try {
       final updatedSettings = ref.read(syncSettingsNotifierProvider);
       await ref.read(syncNotifierProvider.notifier).pushAll(
         updatedSettings.roomId, 
         updatedSettings.password, 
         updatedSettings.userName,
-        updatedSettings.deviceId,
       );
-      setState(() => _isEditingPassword = false);
-      _passwordController.clear();
-      _confirmPasswordController.clear();
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('設定を保存しました'), backgroundColor: Color(0xFF2ECC71)));
+      
+      if (mounted) {
+        setState(() {
+          _isEditingPassword = false;
+          _passwordController.clear();
+          _confirmPasswordController.clear();
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('設定を保存しました'), backgroundColor: Color(0xFF2ECC71))
+        );
+      }
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('エラー: $e'), backgroundColor: Colors.red));
     }

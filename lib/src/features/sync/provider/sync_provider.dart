@@ -68,24 +68,24 @@ class SyncNotifier extends _$SyncNotifier {
     }
   }
 
-  Future<void> pushAll(String roomId, String password, String userName, String deviceId) async {
+  Future<void> pushAll(String roomId, String password, String userName) async {
     // 安全装置: 閲覧専用モード（パートナー表示中）ならアップロードを拒否
     final viewUser = ref.read(calendarViewUserNotifierProvider);
     if (!viewUser.isMe) return;
 
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await ref.read(syncRepositoryProvider).uploadData(roomId, password, userName, deviceId);
+      await ref.read(syncRepositoryProvider).uploadData(roomId, password, userName);
       // 保存成功時にスナップショットを更新
       captureSnapshot();
     });
   }
 
-  Future<void> pullAll(String roomId, String password, String userName, String deviceId) async {
+  Future<void> pullAll(String roomId, String password, String userName) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       try {
-        await ref.read(syncRepositoryProvider).downloadData(roomId, password, userName, deviceId);
+        await ref.read(syncRepositoryProvider).downloadData(roomId, password, userName);
         
         // ローカルの状態を更新
         ref.invalidate(calendarNotifierProvider);

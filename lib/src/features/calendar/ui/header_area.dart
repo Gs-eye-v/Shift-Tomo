@@ -153,7 +153,6 @@ class HeaderArea extends ConsumerWidget {
         settings.roomId,
         settings.password,
         settings.userName,
-        settings.deviceId,
       );
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

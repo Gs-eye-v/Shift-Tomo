@@ -94,7 +94,6 @@ class CalendarNotifier extends _$CalendarNotifier {
           syncSettings.roomId, 
           syncSettings.password, 
           syncSettings.userName,
-          syncSettings.deviceId,
         ).ignore();
       }
 
@@ -121,7 +120,6 @@ class CalendarNotifier extends _$CalendarNotifier {
           syncSettings.roomId, 
           syncSettings.password, 
           syncSettings.userName,
-          syncSettings.deviceId,
         ).ignore();
       }
 

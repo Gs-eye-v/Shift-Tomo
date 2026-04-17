@@ -33,7 +33,7 @@ class RealtimeSyncNotifier extends _$RealtimeSyncNotifier {
     // buildの直後に実行されるように microtask を使用
     Future.microtask(() async {
       try {
-        await ref.read(syncNotifierProvider.notifier).pullAll(roomId, password, userName, deviceId);
+        await ref.read(syncNotifierProvider.notifier).pullAll(roomId, password, userName);
       } catch (e) {
         // 初回同期のエラーはNotifier側で処理される想定
       }
@@ -71,7 +71,7 @@ class RealtimeSyncNotifier extends _$RealtimeSyncNotifier {
 
   Future<void> _handleRemoteUpdate(String roomId, String password, String userName, String deviceId) async {
     // データをプルしてローカルを更新
-    await ref.read(syncNotifierProvider.notifier).pullAll(roomId, password, userName, deviceId);
+    await ref.read(syncNotifierProvider.notifier).pullAll(roomId, password, userName);
     
     // 通知用の状態を更新
     ref.read(remoteUpdateEventProvider.notifier).trigger();
