@@ -4,13 +4,12 @@
     "start_url": ".",
     "display": "standalone",
     "background_color": "#FFFFFF",
-    "theme_color": "#FF9800",
+    "theme_color": "#2ECC71",
     "description": "安全で高速なエンドツーエンド暗号化カレンダー同期アプリ",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
         {
-            "src": "icons/Icon-192.png",
             "sizes": "192x192",
             "type": "image/png"
         },
